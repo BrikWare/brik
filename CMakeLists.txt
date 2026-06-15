@@ -9,6 +9,10 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -pedantic")
 endif()
 
+include_directories(src)
+
 add_executable(brik
     src/main.c
+
+    src/mem/arena.c
 )
