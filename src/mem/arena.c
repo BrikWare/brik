@@ -1,14 +1,6 @@
 #include <stdlib.h>
 #include <stddef.h>
-
-#define ARENA_CHUNK_SIZE (4 * 1024 * 1024) // 4 MB
-
-typedef struct Arena {
-    char* memory;
-    size_t offset;
-    size_t capacity;
-    struct Arena* next;
-} Arena;
+#include "arena.h"
 
 Arena* arena_create(size_t capacity) {
     Arena* arena = malloc(sizeof(Arena));

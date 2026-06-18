@@ -14,5 +14,6 @@ include_directories(src)
 add_executable(brik
     src/main.c
 
+    src/mem/arena.h
     src/mem/arena.c
 )
