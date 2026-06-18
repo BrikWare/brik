@@ -16,4 +16,7 @@ add_executable(brik
 
     src/mem/arena.h
     src/mem/arena.c
+
+    src/utils/hash_map.h
+    src/utils/hash_map.c
 )
