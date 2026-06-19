@@ -20,3 +20,15 @@ add_executable(brik
     src/utils/hash_map.h
     src/utils/hash_map.c
 )
+
+add_executable(brik_tests
+    tests/test_main.c
+
+    tests/utils/test_hash_map.c
+
+    src/mem/arena.h
+    src/mem/arena.c
+
+    src/utils/hash_map.h
+    src/utils/hash_map.c
+)
