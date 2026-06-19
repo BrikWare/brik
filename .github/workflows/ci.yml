@@ -1,0 +1,32 @@
+name: ci
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install GCC 17 and CMake
+        run: |
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+          sudo apt-get update
+          sudo apt-get install -y gcc-17 cmake
+
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-17 100
+
+      - name: Configure CMake
+        run: cmake -B build
+
+      - name: Compile Code
+        run: cmake --build build
+
+      - name: Execute Test Suite
+        run: ./build/brik_tests
