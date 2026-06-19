@@ -14,13 +14,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install GCC 17 and CMake
+      - name: Install GCC 14 and CMake
         run: |
           sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
           sudo apt-get update
-          sudo apt-get install -y gcc-17 cmake
+          sudo apt-get install -y gcc-14 cmake
 
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-17 100
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100
 
       - name: Configure CMake
         run: cmake -B build
