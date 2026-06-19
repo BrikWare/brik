@@ -1,5 +1,7 @@
 #include "hash_map.h"
 
+#include <string.h>
+
 HashMap* create_hash_map(Arena* arena, const size_t capacity) {
     if (capacity <= 0) { // can't create empty hash_map
         return NULL;
@@ -30,7 +32,7 @@ uint32_t hash_str(const char* str) {
     return hash;
 }
 
-void resize(HashMap* hash_map) {
+void hash_map_resize(HashMap* hash_map) {
     size_t old_capacity = hash_map->capacity;
     size_t new_capacity = old_capacity * 2;
     HashEntry* old_entries = hash_map->entries;
@@ -48,15 +50,15 @@ void resize(HashMap* hash_map) {
     // rehash the old entries into the new array
     for (size_t i = 0; i < old_capacity; ++i) {
         if (old_entries[i].key != NULL) {
-            insert(hash_map, old_entries[i].key, old_entries[i].value);
+            hash_map_insert(hash_map, old_entries[i].key, old_entries[i].value);
         }
     }
 }
 
-void insert(HashMap* hash_map, char* str, const uint32_t value) {
+void hash_map_insert(HashMap* hash_map, char* str, const uint32_t value) {
     // if the hash map has reached half of its full size, resize with double the capacity
     if (hash_map->count >= hash_map->capacity/2) {
-        resize(hash_map);
+        hash_map_resize(hash_map);
     }
 
     uint32_t hash = hash_str(str);
@@ -71,5 +73,23 @@ void insert(HashMap* hash_map, char* str, const uint32_t value) {
             break;
         }
         hash = (hash + 1) % hash_map->capacity; // increment the hash and modulo to loop around the hash_map
+    }
+}
+
+MapResult hash_map_get(const HashMap* hash_map, const char* str) {
+    uint32_t hash = hash_str(str);
+    hash %= hash_map->capacity;
+
+    while (1) {
+        if (hash_map->entries[hash].key == NULL) { // if the entry is null it means it does not exist
+            return (MapResult){false, 0};
+        }
+
+
+        if (strcmp(str, hash_map->entries[hash].key) == 0) { // if the entry exists and the strings match, return the entry value
+            return (MapResult){true, hash_map->entries[hash].value};
+        }
+
+        hash = (hash + 1) % hash_map->capacity; // entry not found, increment the hash and modulo to loop around the hash_map
     }
 }
