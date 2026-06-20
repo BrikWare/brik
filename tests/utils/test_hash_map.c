@@ -51,8 +51,8 @@ void test_resizing_and_integrity(void) {
     // as to keep the collisions at a minimum, so when the entries count hits 4, the map
     // automatically resizes and we can check fro the new capacity value
     for (size_t i=0; i<initial_map_capacity/2; ++i) {
-        size_t str_len = rand() % 100;
-        char* str = arena_alloc(arena, str_len);
+        size_t str_len = (rand() % 20) + 5;
+        char* str = arena_alloc(arena, str_len + 1);
         generate_random_string(str, str_len);
         hash_map_insert(hash_map, str, str_len);
     }
