@@ -19,6 +19,9 @@ add_executable(brik
 
     src/utils/hash_map.h
     src/utils/hash_map.c
+
+    src/lexer/lexer.h
+    src/lexer/lexer.c
 )
 
 add_executable(brik_tests

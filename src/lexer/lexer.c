@@ -1,4 +1,6 @@
 #include "lexer.h"
+
+#include <stdio.h>
 #include <string.h>
 
 char advance(Lexer* lex) {
@@ -10,13 +12,15 @@ char advance(Lexer* lex) {
 char look_ahead(const Lexer* lex) {
     if (lex->current_char == '\0') { return '\0'; }
 
-    return lex->source[lex->position+1];
+    return lex->source[lex->position];  // not incremented by one because the lex advances immediately after getting
+                                        // the current char
 }
 
 char look_ahead_two(const Lexer* lex) {
     if (lex->current_char == '\0' || lex->source[lex->position+1] == '\0') { return '\0'; }
 
-    return lex->source[lex->position+2];
+    return lex->source[lex->position+1];    // only incremented by one because the lex advances immediately after
+                                            // getting the current char
 }
 
 void skip_whitespace_and_comments(Lexer* lex) {
@@ -104,7 +108,6 @@ static int check_keyword(const char* start, const char* expected, size_t length)
 TokenType get_identifier_type(const Lexer* lex) {
     const size_t length = lex->position - lex->start_position;
     const char* start = lex->source + lex->start_position;
-
     switch (length) {
         case 2:
             if (start[0]=='i' && start[1]=='f'){ return TOKEN_IF; }

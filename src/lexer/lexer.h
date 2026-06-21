@@ -60,4 +60,6 @@ typedef struct {
     int current_line; // line tracking for reporting errors
 } Lexer;
 
+Token lexer_get_next_token(Lexer* lex);
+
 #endif //BRIK_LEXER_H
