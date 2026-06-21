@@ -48,7 +48,16 @@ typedef struct {
     const char* start;
     size_t length;
     TokenType type;
-    int line_number;
+    int line;
 } Token;
+
+typedef struct {
+    char* source; // stream to compile
+    size_t position; // absolute byte offset of the reading head
+    size_t start_position; // absolute byte offset of the current token's start
+    size_t line_start; // absolute byte offset of the last '\n'
+    char current_char; // byte at the index
+    int current_line; // line tracking for reporting errors
+} Lexer;
 
 #endif //BRIK_LEXER_H
