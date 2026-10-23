@@ -2,9 +2,15 @@
 #include <stddef.h>
 #include "arena.h"
 
-Arena* arena_create(const size_t capacity) {
+
+/* Create Arena with the provided capacity */
+Arena* arena_create(size_t capacity) {
     Arena* arena = malloc(sizeof(Arena));
     if (arena == NULL) return NULL;
+
+    // align capacity
+    capacity += (DEFAULT_ALLOC_ALIGNMENT-1);
+    capacity &= (~(DEFAULT_ALLOC_ALIGNMENT-1));
 
     arena->memory = malloc(capacity);
     if (arena->memory == NULL) {
@@ -19,25 +25,33 @@ Arena* arena_create(const size_t capacity) {
     return arena;
 }
 
-void* arena_alloc(Arena* arena, const size_t size) {
+
+/* Allocate memory from the provided arena */
+void* arena_alloc(Arena* arena, size_t size) {
     if (arena == NULL) return NULL;
-    Arena* root = arena;
+    Arena* root = arena; // keep track of the root chunk to later update its current chunk tracker
     Arena* current = arena->current;
+
+    // align capacity
+    size += (DEFAULT_ALLOC_ALIGNMENT-1);
+    size &= (~(DEFAULT_ALLOC_ALIGNMENT-1));
 
     // if the provided allocation size is bigger than the current chunk's capacity we need to create a new chunk
     if (current->offset + size > current->capacity) {
         current->next = arena_create(size > ARENA_CHUNK_SIZE ? size : ARENA_CHUNK_SIZE);
         if (current->next == NULL) return NULL;
 
-        root->current = current->next;
-        current = current->next;
+        root->current = current->next; // update root chunk's current chunk tracker
+        current = current->next; // update current chunk to the newly created one
     }
 
-    void* ptr = current->memory + current->offset;
-    current->offset += size;
+    void* ptr = current->memory + current->offset; // compute mem pointer
+    current->offset += size; // update offset
     return ptr;
 }
 
+
+/* Reset Arena to the first chunk */
 void arena_reset(Arena* arena) {
     arena->offset = 0;
     arena->current = arena;
@@ -52,6 +66,8 @@ void arena_reset(Arena* arena) {
     }
 }
 
+
+/* Free entire Arena */
 void arena_destroy(Arena* arena) {
     arena_reset(arena);
 
