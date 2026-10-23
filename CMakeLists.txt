@@ -27,6 +27,8 @@ add_executable(brik
 add_executable(brik_tests
     tests/test_main.c
 
+    tests/mem/test_arena.c
+
     tests/utils/test_hash_map.c
 
     src/mem/arena.h
