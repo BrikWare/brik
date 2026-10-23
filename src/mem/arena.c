@@ -15,31 +15,32 @@ Arena* arena_create(const size_t capacity) {
     arena->offset = 0;
     arena->capacity = capacity;
     arena->next = NULL;
+    arena->current = arena;
     return arena;
 }
 
 void* arena_alloc(Arena* arena, const size_t size) {
     if (arena == NULL) return NULL;
+    Arena* root = arena;
+    Arena* current = arena->current;
 
     // if the provided allocation size is bigger than the current chunk's capacity we need to create a new chunk
-    if (arena->offset + size > arena->capacity) {
-        if (arena->next == NULL) { // if we are at the tail of the arena
-            // if the demanded size is bigger than the default arena chunk size, allocate a chunk big enough to fit it
-            // otherwise, allocate a default sized chunk
-            arena->next = arena_create(size > ARENA_CHUNK_SIZE ? size : ARENA_CHUNK_SIZE);
-            if (arena->next == NULL) return NULL;
-        }
+    if (current->offset + size > current->capacity) {
+        current->next = arena_create(size > ARENA_CHUNK_SIZE ? size : ARENA_CHUNK_SIZE);
+        if (current->next == NULL) return NULL;
 
-        return arena_alloc(arena->next, size);
+        root->current = current->next;
+        current = current->next;
     }
 
-    void* ptr = arena->memory + arena->offset;
-    arena->offset += size;
+    void* ptr = current->memory + current->offset;
+    current->offset += size;
     return ptr;
 }
 
 void arena_reset(Arena* arena) {
     arena->offset = 0;
+    arena->current = arena;
     Arena* current_extra_chunk = arena->next;
     arena->next = NULL;
 
@@ -49,4 +50,11 @@ void arena_reset(Arena* arena) {
         free(current_extra_chunk);
         current_extra_chunk = next_extra_chunk;
     }
+}
+
+void arena_destroy(Arena* arena) {
+    arena_reset(arena);
+
+    free(arena->memory);
+    free(arena);
 }
