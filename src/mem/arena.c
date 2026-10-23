@@ -2,23 +2,34 @@
 #include <stddef.h>
 #include "arena.h"
 
-Arena* arena_create(size_t capacity) {
+Arena* arena_create(const size_t capacity) {
     Arena* arena = malloc(sizeof(Arena));
+    if (arena == NULL) return NULL;
+
     arena->memory = malloc(capacity);
-    if (arena->memory == NULL) return NULL;
+    if (arena->memory == NULL) {
+        free(arena); // prevent leak
+        return NULL;
+    }
+
     arena->offset = 0;
     arena->capacity = capacity;
     arena->next = NULL;
     return arena;
 }
 
-void* arena_alloc(Arena* arena, size_t size) {
+void* arena_alloc(Arena* arena, const size_t size) {
     if (arena == NULL) return NULL;
 
+    // if the provided allocation size is bigger than the current chunk's capacity we need to create a new chunk
     if (arena->offset + size > arena->capacity) {
-        while (arena->next == NULL) {
-            arena->next = arena_create(ARENA_CHUNK_SIZE);
+        if (arena->next == NULL) { // if we are at the tail of the arena
+            // if the demanded size is bigger than the default arena chunk size, allocate a chunk big enough to fit it
+            // otherwise, allocate a default sized chunk
+            arena->next = arena_create(size > ARENA_CHUNK_SIZE ? size : ARENA_CHUNK_SIZE);
+            if (arena->next == NULL) return NULL;
         }
+
         return arena_alloc(arena->next, size);
     }
 
