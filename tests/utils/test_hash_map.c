@@ -24,6 +24,7 @@ void insert_get(void) {
     const MapResult result = hash_map_get(hash_map, key);
 
     assert(result.is_valid && result.value == value);
+    printf("PASS: insert_get\n");
 }
 
 void get_non_existing_entry(void) {
@@ -34,6 +35,7 @@ void get_non_existing_entry(void) {
     const MapResult result = hash_map_get(hash_map, key);
 
     assert(result.is_valid == false);
+    printf("PASS: get_non_existing_entry\n");
 }
 
 void test_resizing_and_integrity(void) {
@@ -63,11 +65,14 @@ void test_resizing_and_integrity(void) {
     // ensure the entry we inserted before the resizing is still there
     const MapResult result = hash_map_get(hash_map, control_key);
     assert(result.is_valid && result.value == control_value);
+    printf("PASS: test_resizing_and_integrity\n");
 }
 
 
 void run_hash_map_tests(void) {
+    printf("\n----------Hash Map Tests----------\n");
     insert_get();
     get_non_existing_entry();
     test_resizing_and_integrity();
+    printf("----------------------------------\n");
 }

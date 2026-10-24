@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stddef.h>
+#include <stdint.h>
 #include "arena.h"
 
 
@@ -26,28 +27,43 @@ Arena* arena_create(size_t capacity) {
 }
 
 
-/* Allocate memory from the provided arena */
-void* arena_alloc(Arena* arena, size_t size) {
-    if (arena == NULL) return NULL;
+/* Allocate memory with alignment from the provided arena */
+void* arena_alloc_aligned(Arena* arena, const size_t size, const size_t alignment) {
+    if (arena == NULL || size == 0) return NULL;
+    if ((alignment & (alignment - 1)) != 0) return NULL;
+
     Arena* root = arena; // keep track of the root chunk to later update its current chunk tracker
     Arena* current = arena->current;
 
-    // align capacity
-    size += (DEFAULT_ALLOC_ALIGNMENT-1);
-    size &= (~(DEFAULT_ALLOC_ALIGNMENT-1));
+    uintptr_t current_addr = (uintptr_t)(current->memory + current->offset);
+    uintptr_t aligned_addr = (current_addr + (alignment-1)) & ~(uintptr_t)(alignment-1);
+    size_t padding = (size_t)(aligned_addr - current_addr);
 
     // if the provided allocation size is bigger than the current chunk's capacity we need to create a new chunk
-    if (current->offset + size > current->capacity) {
-        current->next = arena_create(size > ARENA_CHUNK_SIZE ? size : ARENA_CHUNK_SIZE);
+    if (current->offset+size+padding > current->capacity) {
+        const size_t needed = size + alignment;
+        const size_t chunk_cap = needed > ARENA_CHUNK_SIZE ? needed : ARENA_CHUNK_SIZE;
+
+        current->next = arena_create(chunk_cap);
         if (current->next == NULL) return NULL;
 
         root->current = current->next; // update root chunk's current chunk tracker
         current = current->next; // update current chunk to the newly created one
+
+        // recompute padding on the new chunk
+        current_addr = (uintptr_t)(current->memory + current->offset);
+        aligned_addr = (current_addr + (alignment - 1)) & ~(uintptr_t)(alignment - 1);
+        padding = (size_t)(aligned_addr - current_addr);
     }
 
-    void* ptr = current->memory + current->offset; // compute mem pointer
-    current->offset += size; // update offset
-    return ptr;
+    current->offset += padding + size; // update offset
+    return (void*)aligned_addr;
+}
+
+
+/* Allocate memory from the provided arena */
+void* arena_alloc(Arena* arena, const size_t size) {
+    return arena_alloc_aligned(arena, size, DEFAULT_ALLOC_ALIGNMENT);
 }
 
 

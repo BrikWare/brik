@@ -63,7 +63,6 @@ int main(int argc, char* argv[]){
     lex.current_line = 1;
 
 
-
     free(buffer);
     return 0;
 }
