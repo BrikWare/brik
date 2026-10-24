@@ -12,15 +12,13 @@ char advance(Lexer* lex) {
 char look_ahead(const Lexer* lex) {
     if (lex->current_char == '\0') { return '\0'; }
 
-    return lex->source[lex->position];  // not incremented by one because the lex advances immediately after getting
-                                        // the current char
+    return lex->source[lex->position+1];
 }
 
 char look_ahead_two(const Lexer* lex) {
     if (lex->current_char == '\0' || lex->source[lex->position+1] == '\0') { return '\0'; }
 
-    return lex->source[lex->position+1];    // only incremented by one because the lex advances immediately after
-                                            // getting the current char
+    return lex->source[lex->position+2];
 }
 
 void skip_whitespace_and_comments(Lexer* lex) {
@@ -135,26 +133,52 @@ TokenType get_identifier_type(const Lexer* lex) {
     return TOKEN_IDENTIFIER;
 }
 
+Token sweep_string(Lexer* lex, const char quote_char, const TokenType token_type) {
+    advance(lex); // step past the quote to read the body
+
+    while (lex->current_char != quote_char && lex->current_char != '\0') {
+        if (lex->current_char == '\n') {
+            lex->current_line++;
+            lex->line_start = lex->position;
+        }
+
+        // handle escape sequences like \" or \'
+        if (lex->current_char == '\\') {
+            advance(lex); // skip '\'
+            if (lex->current_char == '\0') break;
+        }
+
+        advance(lex);
+    }
+
+    if (lex->current_char == '\0') {
+        // unterminated string error
+        return make_token(lex, TOKEN_ILLEGAL);
+    }
+
+    // consume the closing quote
+    advance(lex);
+
+    return make_token(lex, token_type);
+}
+
 Token sweep_identifier_or_keyword(Lexer* lex) {
-    while (is_alphanumeric(look_ahead(lex))) {
+    while (is_alphanumeric(lex->current_char)) {
         advance(lex);
     };
 
     const TokenType type = get_identifier_type(lex);
-
     return make_token(lex, type);
 }
 
 Token sweep_number(Lexer* lex) {
-    while (is_digit(look_ahead(lex))) {
+    while (is_digit(lex->current_char)) {
         advance(lex);
     }
 
-    if (look_ahead(lex)=='.' && is_digit(look_ahead_two(lex))) {
-        advance(lex); // consume the '.'
-
-        // consume fractional digits
-        while (is_digit(look_ahead(lex))) {
+    if (lex->current_char == '.' && is_digit(look_ahead(lex))) {
+        advance(lex); // consume '.'
+        while (is_digit(lex->current_char)) {
             advance(lex);
         }
     }
@@ -170,34 +194,52 @@ Token lexer_get_next_token(Lexer* lex) {
     if (is_at_end(lex)) return make_token(lex, TOKEN_EOF);
 
     const char c = lex->current_char;
-    advance(lex);
 
     switch (c) {
-        case '+': return make_token(lex, TOKEN_PLUS);
-        case '{': return make_token(lex, TOKEN_BRACES_LEFT);
-        case '}': return make_token(lex, TOKEN_BRACES_RIGHT);
-        case '[': return make_token(lex, TOKEN_BRACKET_LEFT);
-        case ']': return make_token(lex, TOKEN_BRACKET_RIGHT);
-        case '(': return make_token(lex, TOKEN_PARENTHESIS_LEFT);
-        case ')': return make_token(lex, TOKEN_PARENTHESIS_RIGHT);
-        case ':': return make_token(lex, TOKEN_COLON);
-        case ';': return make_token(lex, TOKEN_SEMICOLON);
-        case '.': return make_token(lex, TOKEN_DOT);
-        case '@': return make_token(lex, TOKEN_AT);
-        case '&': return make_token(lex, TOKEN_AMPERSAND);
+        case '+': advance(lex); return make_token(lex, TOKEN_PLUS);
+        case '*': advance(lex); return make_token(lex, TOKEN_MULT);
+        case '/': advance(lex); return make_token(lex, TOKEN_DIV);
+        case ',': advance(lex); return make_token(lex, TOKEN_COMMA);
+        case '{': advance(lex); return make_token(lex, TOKEN_BRACES_LEFT);
+        case '}': advance(lex); return make_token(lex, TOKEN_BRACES_RIGHT);
+        case '[': advance(lex); return make_token(lex, TOKEN_BRACKET_LEFT);
+        case ']': advance(lex); return make_token(lex, TOKEN_BRACKET_RIGHT);
+        case '(': advance(lex); return make_token(lex, TOKEN_PARENTHESIS_LEFT);
+        case ')': advance(lex); return make_token(lex, TOKEN_PARENTHESIS_RIGHT);
+        case ':': advance(lex); return make_token(lex, TOKEN_COLON);
+        case ';': advance(lex); return make_token(lex, TOKEN_SEMICOLON);
+        case '.': advance(lex); return make_token(lex, TOKEN_DOT);
+        case '@': advance(lex); return make_token(lex, TOKEN_AT);
+        case '&': advance(lex); return make_token(lex, TOKEN_AMPERSAND);
 
+        case '!':
+            if (look_ahead(lex) == '='){ advance(lex); advance(lex); return make_token(lex, TOKEN_NOT_EQUAL); }
+            advance(lex); return make_token(lex, TOKEN_BANG);
         case '=':
-            if (look_ahead(lex) == '='){ advance(lex); return make_token(lex, TOKEN_EQUAL_EQUAL); }
-            return make_token(lex, TOKEN_EQUAL);
+            if (look_ahead(lex) == '='){ advance(lex); advance(lex); return make_token(lex, TOKEN_EQUAL_EQUAL); }
+            advance(lex); return make_token(lex, TOKEN_EQUAL);
+
+        case '<':
+            if (look_ahead(lex) == '='){ advance(lex); advance(lex); return make_token(lex, TOKEN_LESS_THAN_OR_EQUAL); }
+            advance(lex); return make_token(lex, TOKEN_LESS_THAN);
+
+        case '>':
+            if (look_ahead(lex) == '='){ advance(lex); advance(lex); return make_token(lex, TOKEN_GREATER_THAN_OR_EQUAL); }
+            advance(lex); return make_token(lex, TOKEN_GREATER_THAN);
 
         case '-':
-            if (look_ahead(lex) == '>'){ advance(lex); return make_token(lex, TOKEN_ARROW); }
-            return make_token(lex, TOKEN_MINUS);
+            if (look_ahead(lex) == '>'){ advance(lex); advance(lex); return make_token(lex, TOKEN_ARROW); }
+
+            advance(lex); return make_token(lex, TOKEN_MINUS);
+
+        case '"':  return sweep_string(lex, '"', TOKEN_STRING);
+        case '\'': return sweep_string(lex, '\'', TOKEN_CHAR);
+
 
         default:
             if (is_alpha(c)) { return sweep_identifier_or_keyword(lex); }
             if (is_digit(c)) { return sweep_number(lex); }
-    }
 
-    return make_token(lex, TOKEN_ILLEGAL);
+            advance(lex); return make_token(lex, TOKEN_ILLEGAL);
+    }
 }

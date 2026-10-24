@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include<unistd.h>
 
 #include "lexer/lexer.h"
 
@@ -62,6 +63,12 @@ int main(int argc, char* argv[]){
     lex.current_char = lex.source[lex.position];
     lex.current_line = 1;
 
+    Token token = lexer_get_next_token(&lex);
+    while (token.type != TOKEN_EOF) {
+        //printf("token type is %d\n", token.type);
+        token = lexer_get_next_token(&lex);
+        printf("%d : %d (%zu)\n", token.line, token.type, token.length);
+    }
 
     free(buffer);
     return 0;
