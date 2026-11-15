@@ -67,8 +67,26 @@ void test_arena_4096_alignment(void) {
 }
 
 
+void test_arena_reset(void) {
+    Arena* arena = arena_create(ARENA_CHUNK_SIZE);
+    assert(arena != NULL);
+
+    void* p1 = arena_alloc(arena, ARENA_CHUNK_SIZE*2);
+    assert(p1 != NULL);
+    assert(arena->next != NULL);
+
+    arena_reset(arena);
+    assert(arena->next == NULL);
+
+    // clean up
+    arena_destroy(arena);
+    printf("PASS: test_arena_reset\n");
+}
+
+
 void run_arena_alloc_tests(void) {
     printf("\n----------Arena Allocation Tests----------\n");
+    test_arena_reset();
     allocate_bigger_than_chunk();
     test_arena_4096_alignment();
     printf("-----------------------------------------\n");
