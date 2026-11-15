@@ -22,6 +22,9 @@ add_executable(brik
 
     src/lexer/lexer.h
     src/lexer/lexer.c
+
+    src/ast/ast.c
+    src/ast/ast.h
 )
 
 add_executable(brik_tests
@@ -31,6 +34,8 @@ add_executable(brik_tests
 
     tests/utils/test_hash_map.c
 
+    tests/ast/test_ast.c
+
     src/mem/arena.h
     src/mem/arena.c
 
@@ -39,4 +44,7 @@ add_executable(brik_tests
 
     src/lexer/lexer.h
     src/lexer/lexer.c
+
+    src/ast/ast.c
+    src/ast/ast.h
 )
