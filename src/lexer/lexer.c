@@ -73,6 +73,62 @@ Token lexer_get_next_token(Lexer* lex) {
     }
 }
 
+const char* token_type_name(const TokenType token_type) {
+    switch (token_type) {
+        case TOKEN_NUMBER: return "number";
+        case TOKEN_STRING: return "string";
+        case TOKEN_CHAR: return "char";
+        case TOKEN_IDENTIFIER: return "identifier";
+
+        case TOKEN_PLUS: return "+";
+        case TOKEN_MINUS: return "-";
+        case TOKEN_MULT: return "*";
+        case TOKEN_DIV: return "/";
+        case TOKEN_EQUAL_EQUAL: return "==";
+        case TOKEN_NOT_EQUAL: return "!=";
+        case TOKEN_BANG: return "!";
+        case TOKEN_GREATER_THAN: return ">";
+        case TOKEN_GREATER_THAN_OR_EQUAL: return ">=";
+        case TOKEN_LESS_THAN: return "<";
+        case TOKEN_LESS_THAN_OR_EQUAL: return "<=";
+
+        case TOKEN_EQUAL: return "=";
+
+        case TOKEN_LET: return "let";
+        case TOKEN_FN: return "fn";
+        case TOKEN_STRUCT: return "struct";
+        case TOKEN_IMPL: return "impl";
+        case TOKEN_IF: return "if";
+        case TOKEN_ELSE: return "else";
+        case TOKEN_FOR: return "for";
+        case TOKEN_WHILE: return "while";
+        case TOKEN_RETURN: return "return";
+        case TOKEN_TRUE: return "true";
+        case TOKEN_FALSE: return "false";
+
+        case TOKEN_COLON: return ":";
+
+        case TOKEN_ARROW: return "->";
+        case TOKEN_AMPERSAND: return "&";
+
+        case TOKEN_DOT: return ".";
+
+        case TOKEN_AT: return "@";
+
+        case TOKEN_PARENTHESIS_LEFT: return "(";
+        case TOKEN_PARENTHESIS_RIGHT: return ")";
+        case TOKEN_BRACKET_LEFT: return "[";
+        case TOKEN_BRACKET_RIGHT: return "]";
+        case TOKEN_BRACES_LEFT: return "{";
+        case TOKEN_BRACES_RIGHT: return "}";
+        case TOKEN_SEMICOLON: return ";";
+        case TOKEN_COMMA: return ",";
+
+        case TOKEN_ILLEGAL: return "illegal";
+        case TOKEN_EOF: return "eof";
+    };
+}
+
 // -- cursor --
 static char advance(Lexer* lex) {
     if (lex->current_char == '\0') { return '\0'; }
