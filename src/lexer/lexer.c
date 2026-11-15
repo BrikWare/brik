@@ -127,6 +127,8 @@ const char* token_type_name(const TokenType token_type) {
         case TOKEN_ILLEGAL: return "illegal";
         case TOKEN_EOF: return "eof";
     };
+
+    return "unknown";
 }
 
 // -- cursor --
