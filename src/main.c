@@ -66,8 +66,8 @@ int main(int argc, char* argv[]){
     Token token = lexer_get_next_token(&lex);
     while (token.type != TOKEN_EOF) {
         //printf("token type is %d\n", token.type);
-        token = lexer_get_next_token(&lex);
         printf("%d : %d (%zu)\n", token.line, token.type, token.length);
+        token = lexer_get_next_token(&lex);
     }
 
     free(buffer);
