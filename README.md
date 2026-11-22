@@ -1,8 +1,18 @@
+<div align="center">
+
+<img src="assets/brik.png" alt="brik" width="200"/>
+
 # brik
 
-![ci](https://github.com/BrikWare/brik/actions/workflows/ci.yml/badge.svg)
+[![ci](https://github.com/BrikWare/brik/actions/workflows/ci.yml/badge.svg)](https://github.com/BrikWare/brik/actions/workflows/ci.yml)
 
 A small compiler and language that will serve as the foundation for the [brik kernel](https://github.com/BrikWare/brik-kernel).
+
+</div>
+
+Its safety model is purposely small and explicit - typestates catch incorrect object-state usage at compile time, 
+references to local variables can't escape their functions, pointer unsafe code is marked as _raw_, and failures 
+are plain error codes.
 
 Currently, the following features are planned:
 - **typestates** for kernel object safety;
