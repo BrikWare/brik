@@ -133,6 +133,30 @@ const char* token_type_name(const TokenType token_type) {
     return "unknown";
 }
 
+Lexer lexer_init(const char* src) {
+    Lexer lex;
+    lex.source = src;
+    lex.position = 0;
+    lex.start_position = 0;
+    lex.line_start = 0;
+    lex.current_char = lex.source[lex.position];
+    lex.current_line = 1;
+    lex.start_line = 1;
+    lex.start_column = 1;
+
+    return lex;
+}
+
+void lexer_reset(Lexer* lex) {
+    lex->position = 0;
+    lex->start_position = 0;
+    lex->line_start = 0;
+    lex->current_char = lex->source[lex->position];
+    lex->current_line = 1;
+    lex->start_line = 1;
+    lex->start_column = 1;
+}
+
 // -- cursor --
 static char advance(Lexer* lex) {
     if (lex->current_char == '\0') { return '\0'; }
