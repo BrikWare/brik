@@ -150,6 +150,7 @@ static Token make_token(const Lexer* lex, const TokenType type) {
     token.start = lex->source + lex->start_position;
     token.length = lex->position - lex->start_position;
     token.line = lex->current_line;
+    token.column = (int)(lex->start_position - lex->line_start + 1);
 
     return token;
 }

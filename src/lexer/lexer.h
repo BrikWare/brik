@@ -48,13 +48,14 @@ typedef struct {
     size_t length;
     TokenType type;
     int line;
+    int column;
 } Token;
 
 typedef struct {
     char* source; // stream to compile
     size_t position; // absolute byte offset of the reading head
     size_t start_position; // absolute byte offset of the current token's start
-    size_t line_start; // absolute byte offset of the last '\n'
+    size_t line_start; // absolute byte offset of the current line's first byte
     char current_char; // byte at the index
     int current_line; // line tracking for reporting errors
 } Lexer;
