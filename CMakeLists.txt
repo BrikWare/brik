@@ -25,6 +25,9 @@ add_executable(brik
 
     src/ast/ast.c
     src/ast/ast.h
+
+    src/parser/parser.c
+    src/parser/parser.h
 )
 
 add_executable(brik_tests

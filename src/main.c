@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include<unistd.h>
 
 #include "lexer/lexer.h"
+#include "parser/parser.h"
 
 char* read_file(const char* filepath) {
     if (filepath == NULL) {
@@ -55,21 +55,20 @@ int main(int argc, char* argv[]){
 
     char* buffer = read_file(argv[1]);
 
-    Lexer lex;
-    lex.source = buffer;
-    lex.position = 0;
-    lex.start_position = 0;
-    lex.line_start = 0;
-    lex.current_char = lex.source[lex.position];
-    lex.current_line = 1;
+    Arena* arena = arena_create(ARENA_CHUNK_SIZE);
+
+    Lexer lex = lexer_create(buffer);
+
+    Parser parser = parser_create(arena);
 
     Token token = lexer_get_next_token(&lex);
     while (token.type != TOKEN_EOF) {
-        //printf("token type is %d\n", token.type);
-        printf("%d : %d (%zu)\n", token.line, token.type, token.length);
+        parser_add_token(&parser, token);
+        printf("%s \t\t(%d, %zu)\n", token_type_name(token.type), token.line, token.length);
         token = lexer_get_next_token(&lex);
     }
 
     free(buffer);
+    arena_destroy(arena);
     return 0;
 }
