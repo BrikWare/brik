@@ -7,6 +7,7 @@
 
 void run_hash_map_tests(void);
 void run_arena_alloc_tests(void);
+void run_lexer_tests(void);
 void run_ast_tests(void);
 
 int main(void) {
@@ -14,6 +15,7 @@ int main(void) {
 
     run_arena_alloc_tests();
     run_hash_map_tests();
+    run_lexer_tests();
     run_ast_tests();
 
     fprintf(stdout, GREEN "SUCCESS: All tests passed!\n");

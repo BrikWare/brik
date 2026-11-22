@@ -34,6 +34,8 @@ add_executable(brik_tests
 
     tests/utils/test_hash_map.c
 
+    tests/lexer/test_lexer.c
+
     tests/ast/test_ast.c
 
     src/mem/arena.h
