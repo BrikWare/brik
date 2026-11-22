@@ -19,6 +19,8 @@ Token lexer_get_next_token(Lexer* lex) {
     skip_whitespace_and_comments(lex);
 
     lex->start_position = lex->position;
+    lex->start_line = lex->current_line;
+    lex->start_column = (int)(lex->position - lex->line_start +1);
 
     if (is_at_end(lex)) return make_token(lex, TOKEN_EOF);
 
@@ -149,8 +151,8 @@ static Token make_token(const Lexer* lex, const TokenType type) {
     token.type = type;
     token.start = lex->source + lex->start_position;
     token.length = lex->position - lex->start_position;
-    token.line = lex->current_line;
-    token.column = (int)(lex->start_position - lex->line_start + 1);
+    token.line = lex->start_line;
+    token.column = lex->start_column;
 
     return token;
 }
@@ -268,7 +270,9 @@ static Token sweep_string(Lexer* lex, const char quote_char, const TokenType tok
     while (lex->current_char != quote_char && lex->current_char != '\0') {
         if (lex->current_char == '\n') {
             lex->current_line++;
+            advance(lex);
             lex->line_start = lex->position;
+            continue;
         }
 
         // handle escape sequences like \" or \'

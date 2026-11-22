@@ -56,8 +56,10 @@ typedef struct {
     size_t position; // absolute byte offset of the reading head
     size_t start_position; // absolute byte offset of the current token's start
     size_t line_start; // absolute byte offset of the current line's first byte
-    char current_char; // byte at the index
     int current_line; // line tracking for reporting errors
+    int start_line; // line of the current token's start
+    int start_column; // column of the current token's start
+    char current_char; // byte at the index
 } Lexer;
 
 Token lexer_get_next_token(Lexer* lex);
