@@ -64,7 +64,7 @@ typedef struct {
 
 Token lexer_get_next_token(Lexer* lex);
 const char* token_type_name(const TokenType token_type);
-Lexer lexer_init(const char* src);
+Lexer lexer_create(const char* src);
 void lexer_reset(Lexer* lex);
 
 #endif //BRIK_LEXER_H

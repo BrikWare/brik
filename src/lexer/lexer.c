@@ -133,7 +133,7 @@ const char* token_type_name(const TokenType token_type) {
     return "unknown";
 }
 
-Lexer lexer_init(const char* src) {
+Lexer lexer_create(const char* src) {
     Lexer lex;
     lex.source = src;
     lex.position = 0;
