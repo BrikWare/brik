@@ -148,6 +148,8 @@ Lexer lexer_create(const char* src) {
 }
 
 void lexer_reset(Lexer* lex) {
+    if (lex == NULL) return;
+
     lex->position = 0;
     lex->start_position = 0;
     lex->line_start = 0;
